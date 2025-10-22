@@ -1,1 +1,96 @@
-<p>task-form works!</p>
+<div class="task-form-container">
+  <h3>{{ isEditMode ? 'Editar Tarefa' : 'Nova Tarefa' }}</h3>
+
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+    <div class="field mb-4">
+      <label for="title" class="block mb-2">Título *</label>
+      <input
+        pInputText
+        id="title"
+        formControlName="title"
+        class="w-full"
+        placeholder="Digite o título da tarefa"
+      />
+      <small
+        *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+        class="p-error block mt-1"
+      >
+        O título deve ter pelo menos 3 caracteres.
+      </small>
+    </div>
+
+    <div class="field mb-4">
+      <label for="description" class="block mb-2">Descrição *</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        rows="4"
+        class="w-full"
+        placeholder="Descreva os detalhes da tarefa"
+        style="padding: 0.75rem; border: 1px solid #ced4da; border-radius: 6px; font-family: inherit; width: 100%;"
+      ></textarea>
+      <small
+        *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
+        class="p-error block mt-1"
+      >
+        A descrição deve ter pelo menos 10 caracteres.
+      </small>
+    </div>
+
+    <div class="field mb-4">
+      <label for="priority" class="block mb-2">Prioridade *</label>
+      <select
+        id="priority"
+        formControlName="priority"
+        class="w-full"
+        style="padding: 0.75rem; border: 1px solid #ced4da; border-radius: 6px; font-family: inherit;"
+      >
+        <option value="low">Baixa</option>
+        <option value="medium">Média</option>
+        <option value="high">Alta</option>
+      </select>
+    </div>
+
+    <div class="field mb-4">
+      <label for="dueDate" class="block mb-2">Data de Vencimento *</label>
+      <input
+        type="date"
+        id="dueDate"
+        formControlName="dueDate"
+        class="w-full"
+        style="padding: 0.75rem; border: 1px solid #ced4da; border-radius: 6px; font-family: inherit;"
+      />
+      <small
+        *ngIf="taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched"
+        class="p-error block mt-1"
+      >
+        Selecione uma data de vencimento.
+      </small>
+    </div>
+
+    <div class="field-checkbox mb-4" *ngIf="isEditMode">
+      <input
+        type="checkbox"
+        id="completed"
+        formControlName="completed"
+        style="margin-right: 0.5rem; width: 1.25rem; height: 1.25rem; cursor: pointer;"
+      />
+      <label for="completed" style="cursor: pointer;">Tarefa concluída</label>
+    </div>
+
+    <div class="flex gap-2 justify-content-end mt-4">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        (onClick)="cancel()"
+        type="button"
+      />
+      <p-button
+        [label]="isEditMode ? 'Atualizar' : 'Salvar'"
+        icon="pi pi-check"
+        type="submit"
+        [disabled]="taskForm.invalid"
+      />
+    </div>
+  </form>
+</div>
