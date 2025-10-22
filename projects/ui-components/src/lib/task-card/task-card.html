@@ -1,55 +1,82 @@
-<p-card [style]="{'margin-bottom': '1rem'}">
+<p-card [style]="{'margin-bottom': '1.5rem', 'transition': 'all 0.3s ease'}">
   <!-- HEADER: Checkbox + Título + Tag -->
-  <div class="flex justify-content-between align-items-center mb-3" style="padding-bottom: 0.75rem; border-bottom: 1px solid #dee2e6;">
-    <div class="flex align-items-center gap-2">
-      <input
-        type="checkbox"
-        [(ngModel)]="task.completed"
-        (change)="toggleComplete()"
-        style="width: 1.25rem; height: 1.25rem; cursor: pointer;"
+  <div class="card-header" style="padding: 1.5rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-bottom: 2px solid #f3f4f6;">
+    <div class="flex justify-content-between align-items-center">
+      <div class="flex align-items-center gap-2" style="flex: 1;">
+        <input
+          type="checkbox"
+          [(ngModel)]="task.completed"
+          (change)="toggleComplete()"
+          style="width: 1.5rem; height: 1.5rem; cursor: pointer;"
+        />
+        <h3 
+          class="m-0" 
+          [style.text-decoration]="task.completed ? 'line-through' : 'none'" 
+          [style.opacity]="task.completed ? '0.6' : '1'"
+          style="font-size: 1.35rem; font-weight: 700; color: #1f2937; transition: all 0.3s ease;">
+          {{ task.title }}
+        </h3>
+      </div>
+      <p-tag 
+        [value]="task.priority" 
+        [severity]="getPrioritySeverity()"
+        [style]="{'animation': 'pulse 2s infinite'}"
       />
-      <h3 class="m-0" [style.text-decoration]="task.completed ? 'line-through' : 'none'" style="font-size: 1.25rem;">
-        {{ task.title }}
-      </h3>
     </div>
-    <p-tag [value]="task.priority" [severity]="getPrioritySeverity()" />
   </div>
 
-  <!-- CORPO: Descrição -->
-  <div style="margin-bottom: 1rem; padding: 0.5rem 0;">
-    <strong style="display: block; margin-bottom: 0.5rem; color: #6c757d; font-size: 0.875rem;">Descrição:</strong>
-    <p style="margin: 0; color: #495057; line-height: 1.6; font-size: 0.95rem;">
-      {{ task.description }}
-    </p>
+  <!-- CORPO: Descrição com ícone -->
+  <div style="padding: 1.5rem; background: white;">
+    <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
+      <i class="pi pi-align-left" style="color: #667eea; font-size: 1.2rem; margin-top: 0.2rem;"></i>
+      <div style="flex: 1;">
+        <strong style="display: block; margin-bottom: 0.5rem; color: #667eea; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px;">
+          Descrição
+        </strong>
+        <p style="margin: 0; color: #4b5563; line-height: 1.7; font-size: 1rem;">
+          {{ task.description }}
+        </p>
+      </div>
+    </div>
   </div>
 
-  <!-- DATAS -->
-  <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem; padding-top: 0.75rem; border-top: 1px solid #dee2e6;">
-    <small style="color: #6c757d; display: flex; align-items: center; gap: 0.25rem;">
-      <i class="pi pi-calendar"></i>
-      <span>Criado: {{ formatDate(task.createdAt) }}</span>
-    </small>
-    <small style="color: #6c757d; display: flex; align-items: center; gap: 0.25rem;">
-      <i class="pi pi-clock"></i>
-      <span>Vencimento: {{ formatDate(task.dueDate) }}</span>
-    </small>
+  <!-- DATAS com ícones modernos -->
+  <div style="display: flex; gap: 2rem; padding: 1rem 1.5rem; background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border-top: 1px solid #e5e7eb;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="background: #10b981; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+        <i class="pi pi-calendar" style="color: white; font-size: 0.875rem;"></i>
+      </div>
+      <div>
+        <small style="display: block; color: #6b7280; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Criado</small>
+        <small style="color: #1f2937; font-weight: 600; font-size: 0.875rem;">{{ formatDate(task.createdAt) }}</small>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="background: #f59e0b; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+        <i class="pi pi-clock" style="color: white; font-size: 0.875rem;"></i>
+      </div>
+      <div>
+        <small style="display: block; color: #6b7280; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Vencimento</small>
+        <small style="color: #1f2937; font-weight: 600; font-size: 0.875rem;">{{ formatDate(task.dueDate) }}</small>
+      </div>
+    </div>
   </div>
 
-  <!-- FOOTER: Botões -->
-  <div style="display: flex; gap: 0.5rem; justify-content: flex-end; padding-top: 0.75rem; border-top: 1px solid #dee2e6;">
+  <!-- FOOTER: Botões com espaçamento -->
+  <div style="display: flex; gap: 0.75rem; justify-content: flex-end; padding: 1.25rem 1.5rem; background: white; border-top: 1px solid #f3f4f6;">
     <p-button
       icon="pi pi-pencil"
       label="Editar"
       severity="info"
       (onClick)="editTask()"
-      [style]="{'padding': '0.5rem 1rem'}"
+      [style]="{'border-radius': '10px', 'font-weight': '600'}"
     />
     <p-button
       icon="pi pi-trash"
       label="Excluir"
       severity="danger"
       (onClick)="deleteTask()"
-      [style]="{'padding': '0.5rem 1rem'}"
+      [style]="{'border-radius': '10px', 'font-weight': '600'}"
     />
   </div>
 </p-card>

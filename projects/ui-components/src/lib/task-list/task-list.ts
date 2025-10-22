@@ -37,4 +37,13 @@ export class TaskList {
   toggleComplete(task: Task) {
     this.onToggleComplete.emit(task);
   }
+
+  // NOVOS MÉTODOS PARA ESTATÍSTICAS
+  get completedCount(): number {
+    return this.tasks.filter(t => t.completed).length;
+  }
+
+  get pendingCount(): number {
+    return this.tasks.filter(t => !t.completed).length;
+  }
 }

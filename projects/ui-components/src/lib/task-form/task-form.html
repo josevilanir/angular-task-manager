@@ -1,15 +1,18 @@
-<div class="task-form-container">
-  <h3>{{ isEditMode ? 'Editar Tarefa' : 'Nova Tarefa' }}</h3>
-
+<div class="task-form-container" style="animation: fadeIn 0.3s ease;">
   <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
-    <div class="field mb-4">
-      <label for="title" class="block mb-2">Título *</label>
+    <!-- Título -->
+    <div class="field" style="animation: slideIn 0.3s ease; animation-delay: 0.1s; animation-fill-mode: both;">
+      <label for="title" class="block mb-2" style="display: flex; align-items: center; gap: 0.5rem;">
+        <i class="pi pi-bookmark" style="color: #667eea;"></i>
+        <span>Título *</span>
+      </label>
       <input
         pInputText
         id="title"
         formControlName="title"
         class="w-full"
-        placeholder="Digite o título da tarefa"
+        placeholder="Ex: Implementar nova funcionalidade"
+        style="padding: 0.875rem 1rem; font-size: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; transition: all 0.3s ease;"
       />
       <small
         *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
@@ -19,15 +22,19 @@
       </small>
     </div>
 
-    <div class="field mb-4">
-      <label for="description" class="block mb-2">Descrição *</label>
+    <!-- Descrição -->
+    <div class="field" style="animation: slideIn 0.3s ease; animation-delay: 0.2s; animation-fill-mode: both;">
+      <label for="description" class="block mb-2" style="display: flex; align-items: center; gap: 0.5rem;">
+        <i class="pi pi-align-left" style="color: #667eea;"></i>
+        <span>Descrição *</span>
+      </label>
       <textarea
         id="description"
         formControlName="description"
         rows="4"
         class="w-full"
-        placeholder="Descreva os detalhes da tarefa"
-        style="padding: 0.75rem; border: 1px solid #ced4da; border-radius: 6px; font-family: inherit; width: 100%;"
+        placeholder="Descreva os detalhes da tarefa..."
+        style="padding: 0.875rem 1rem; font-size: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-family: inherit; width: 100%; transition: all 0.3s ease; resize: vertical;"
       ></textarea>
       <small
         *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
@@ -37,59 +44,92 @@
       </small>
     </div>
 
-    <div class="field mb-4">
-      <label for="priority" class="block mb-2">Prioridade *</label>
-      <select
-        id="priority"
-        formControlName="priority"
-        class="w-full"
-        style="padding: 0.75rem; border: 1px solid #ced4da; border-radius: 6px; font-family: inherit;"
-      >
-        <option value="low">Baixa</option>
-        <option value="medium">Média</option>
-        <option value="high">Alta</option>
-      </select>
+    <!-- Grid de 2 colunas -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; animation: slideIn 0.3s ease; animation-delay: 0.3s; animation-fill-mode: both;">
+      <!-- Prioridade -->
+      <div class="field">
+        <label for="priority" class="block mb-2" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="pi pi-flag" style="color: #667eea;"></i>
+          <span>Prioridade *</span>
+        </label>
+        <select
+          id="priority"
+          formControlName="priority"
+          class="w-full"
+          style="padding: 0.875rem 1rem; font-size: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-family: inherit; transition: all 0.3s ease; cursor: pointer; background: white;"
+        >
+          <option value="low">🟢 Baixa</option>
+          <option value="medium">🟡 Média</option>
+          <option value="high">🔴 Alta</option>
+        </select>
+      </div>
+
+      <!-- Data -->
+      <div class="field">
+        <label for="dueDate" class="block mb-2" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="pi pi-calendar" style="color: #667eea;"></i>
+          <span>Vencimento *</span>
+        </label>
+        <input
+          type="date"
+          id="dueDate"
+          formControlName="dueDate"
+          class="w-full"
+          style="padding: 0.875rem 1rem; font-size: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-family: inherit; transition: all 0.3s ease; cursor: pointer;"
+        />
+        <small
+          *ngIf="taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched"
+          class="p-error block mt-1"
+        >
+          Selecione uma data de vencimento.
+        </small>
+      </div>
     </div>
 
-    <div class="field mb-4">
-      <label for="dueDate" class="block mb-2">Data de Vencimento *</label>
-      <input
-        type="date"
-        id="dueDate"
-        formControlName="dueDate"
-        class="w-full"
-        style="padding: 0.75rem; border: 1px solid #ced4da; border-radius: 6px; font-family: inherit;"
-      />
-      <small
-        *ngIf="taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched"
-        class="p-error block mt-1"
-      >
-        Selecione uma data de vencimento.
-      </small>
+    <!-- Checkbox concluída (apenas no modo edição) -->
+    <div class="field-checkbox" *ngIf="isEditMode" style="animation: slideIn 0.3s ease; animation-delay: 0.4s; animation-fill-mode: both; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <input
+          type="checkbox"
+          id="completed"
+          formControlName="completed"
+          style="width: 1.5rem; height: 1.5rem; cursor: pointer;"
+        />
+        <label for="completed" style="cursor: pointer; font-weight: 600; color: #059669; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="pi pi-check-circle"></i>
+          <span>Marcar tarefa como concluída</span>
+        </label>
+      </div>
     </div>
 
-    <div class="field-checkbox mb-4" *ngIf="isEditMode">
-      <input
-        type="checkbox"
-        id="completed"
-        formControlName="completed"
-        style="margin-right: 0.5rem; width: 1.25rem; height: 1.25rem; cursor: pointer;"
-      />
-      <label for="completed" style="cursor: pointer;">Tarefa concluída</label>
-    </div>
-
-    <div class="flex gap-2 justify-content-end mt-4">
+    <!-- Botões -->
+    <div class="flex gap-2 justify-content-end mt-4" style="padding-top: 1.5rem; border-top: 2px solid #f3f4f6; animation: fadeIn 0.5s ease; animation-delay: 0.5s; animation-fill-mode: both;">
       <p-button
         label="Cancelar"
         severity="secondary"
         (onClick)="cancel()"
         type="button"
+        icon="pi pi-times"
+        [style]="{
+          'padding': '0.875rem 1.75rem',
+          'border-radius': '10px',
+          'font-weight': '600'
+        }"
       />
       <p-button
-        [label]="isEditMode ? 'Atualizar' : 'Salvar'"
+        [label]="isEditMode ? 'Atualizar Tarefa' : 'Criar Tarefa'"
         icon="pi pi-check"
         type="submit"
         [disabled]="taskForm.invalid"
+        [style]="{
+          'background': taskForm.invalid ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          'border': 'none',
+          'padding': '0.875rem 2rem',
+          'border-radius': '10px',
+          'font-weight': '700',
+          'box-shadow': taskForm.invalid ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)',
+          'cursor': taskForm.invalid ? 'not-allowed' : 'pointer'
+        }"
       />
     </div>
   </form>
