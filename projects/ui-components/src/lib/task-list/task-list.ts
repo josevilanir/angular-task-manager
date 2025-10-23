@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskCard } from '../task-card/task-card';
 import { Task } from '../models/task.model';
-import { Button } from 'primeng/button';
+import { ButtonComponent } from '../tailwind-components/button.component';
 
 @Component({
   selector: 'app-task-list',
@@ -10,7 +10,7 @@ import { Button } from 'primeng/button';
   imports: [
     CommonModule,
     TaskCard,
-    Button
+    ButtonComponent  // ← ADICIONAR ESTA LINHA
   ],
   templateUrl: './task-list.html',
   styleUrl: './task-list.css'
@@ -38,7 +38,7 @@ export class TaskList {
     this.onToggleComplete.emit(task);
   }
 
-  // NOVOS MÉTODOS PARA ESTATÍSTICAS
+  // Métodos para estatísticas
   get completedCount(): number {
     return this.tasks.filter(t => t.completed).length;
   }

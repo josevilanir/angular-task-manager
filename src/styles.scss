@@ -1,6 +1,8 @@
 /* ====== Tailwind ====== */
 /* v4 */
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ====== Prime Icons ====== */
 @import "primeicons/primeicons.css";

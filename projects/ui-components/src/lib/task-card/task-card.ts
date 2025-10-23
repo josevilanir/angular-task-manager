@@ -1,20 +1,20 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Card } from 'primeng/card';
-import { Button } from 'primeng/button';
-import { Tag } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 import { Task } from '../models/task.model';
+import { BadgeComponent } from '../tailwind-components/badge.component';
+import { CardComponent } from '../tailwind-components/card.component';
+import { ButtonComponent } from '../tailwind-components/button.component';
 
 @Component({
   selector: 'app-task-card',
   standalone: true,
   imports: [
     CommonModule,
-    Card,
-    Button,
-    Tag,
-    FormsModule
+    FormsModule,
+    BadgeComponent,
+    CardComponent,
+    ButtonComponent
   ],
   templateUrl: './task-card.html',
   styleUrl: './task-card.css'
@@ -37,17 +37,26 @@ export class TaskCard {
     this.onToggleComplete.emit(this.task);
   }
 
-  getPrioritySeverity(): 'success' | 'info' | 'warn' | 'danger' {
+  getPriorityVariant(): 'success' | 'warning' | 'danger' {
     switch (this.task.priority) {
       case 'high':
         return 'danger';
       case 'medium':
-        return 'warn';
+        return 'warning';
       case 'low':
-        return 'info';
+        return 'success';
       default:
-        return 'info';
+        return 'warning';
     }
+  }
+
+  getPriorityLabel(): string {
+    const labels = {
+      high: 'Alta',
+      medium: 'Média',
+      low: 'Baixa'
+    };
+    return labels[this.task.priority];
   }
 
   formatDate(date: Date): string {
