@@ -1,112 +1,123 @@
-import { Component, signal, computed } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+// src/app/app.ts
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
+
 import { TaskList } from '../../projects/ui-components/src/lib/task-list/task-list';
 import { TaskForm } from '../../projects/ui-components/src/lib/task-form/task-form';
-import { TaskService, Task } from './services/task.service';
+
+// 👇 IMPORTA O MODELO COMPARTILHADO
+import type { Task } from '../../projects/ui-components/src/lib/models/task.model';
+
+import { TaskService } from './services/task.service';
+
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
 import { Toolbar } from 'primeng/toolbar';
+import { Button } from 'primeng/button';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet,
     CommonModule,
-    TaskList,
-    TaskForm,
+    RouterOutlet,
+
+    // PrimeNG
     Dialog,
     ConfirmDialog,
     Toast,
+    Toolbar,
     Button,
-    Toolbar
+
+    // UI Components
+    TaskList,
+    TaskForm,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
-export class App {
-  protected readonly title = signal('Task Manager - Gerenciador de Tarefas');
-  
-  displayDialog = signal(false);
-  selectedTask = signal<Task | undefined>(undefined);
-  tasks = computed(() => this.taskService.tasks());
+export class AppComponent {
+  title = signal('Task Manager');
+  dialogVisible = signal(false);
+  isEditing = signal(false);
+  currentTask = signal<Task | null>(null);
 
-  constructor(
-    private taskService: TaskService,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService
-  ) {}
+  private taskService = inject(TaskService);
+  private confirm = inject(ConfirmationService);
+  private messages = inject(MessageService);
 
-  showAddDialog() {
-    this.selectedTask.set(undefined);
-    this.displayDialog.set(true);
+  currentYear = computed(() => new Date().getFullYear());
+
+  // Fornece as tarefas para o template
+  tasks(): Task[] {
+    // se seu service expõe signal(), pegue o valor; senão, getTasks()
+    const anySvc = this.taskService as any;
+    if (typeof anySvc.tasksSignal === 'function') return anySvc.tasksSignal() as Task[];
+    if (typeof anySvc.tasks === 'function') return anySvc.tasks() as Task[];
+    if (typeof anySvc.getTasks === 'function') return anySvc.getTasks() as Task[];
+    return [];
   }
 
-  showEditDialog(task: Task) {
-    this.selectedTask.set(task);
-    this.displayDialog.set(true);
+  openCreateDialog() {
+    this.currentTask.set(null);
+    this.isEditing.set(false);
+    this.dialogVisible.set(true);
   }
 
-  hideDialog() {
-    this.displayDialog.set(false);
-    this.selectedTask.set(undefined);
+  openEditDialog(task: Task) {
+    this.currentTask.set(task);
+    this.isEditing.set(true);
+    this.dialogVisible.set(true);
   }
 
-  saveTask(taskData: Partial<Task>) {
-    const currentTask = this.selectedTask();
-    
-    if (currentTask) {
-      this.taskService.updateTask(currentTask.id, taskData);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Tarefa atualizada com sucesso!'
-      });
-    } else {
-      this.taskService.addTask(taskData);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Tarefa criada com sucesso!'
-      });
+  closeDialog() {
+    this.dialogVisible.set(false);
+    this.currentTask.set(null);
+    this.isEditing.set(false);
+  }
+
+  saveTask(payload: Partial<Task>) {
+    try {
+      if (this.isEditing()) {
+        const t = this.currentTask();
+        if (!t) return;
+        this.taskService.updateTask(t.id, payload);
+        this.messages.add({ severity: 'success', summary: 'Atualizado', detail: 'Tarefa atualizada com sucesso!' });
+      } else {
+        this.taskService.createTask(payload); // ver implementação no service abaixo
+        this.messages.add({ severity: 'success', summary: 'Criado', detail: 'Tarefa criada com sucesso!' });
+      }
+    } finally {
+      this.closeDialog();
     }
-    
-    this.hideDialog();
   }
 
-  deleteTask(task: Task) {
-    this.confirmationService.confirm({
-      message: `Tem certeza que deseja excluir a tarefa "${task.title}"?`,
-      header: 'Confirmar Exclusão',
+  confirmDelete(task: Task) {
+    this.confirm.confirm({
+      header: 'Confirmar exclusão',
+      message: `Tem certeza que deseja excluir "${task.title}"?`,
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
+      acceptLabel: 'Excluir',
+      rejectLabel: 'Cancelar',
       accept: () => {
         this.taskService.deleteTask(task.id);
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Excluído',
-          detail: 'Tarefa excluída com sucesso!'
-        });
-      }
+        this.messages.add({ severity: 'warn', summary: 'Excluído', detail: 'Tarefa excluída com sucesso!' });
+      },
     });
   }
 
   toggleComplete(task: Task) {
     this.taskService.toggleTaskComplete(task.id);
-    const message = task.completed 
-      ? 'Tarefa marcada como pendente' 
-      : 'Tarefa marcada como concluída';
-    
-    this.messageService.add({
+    const becameCompleted = !task.completed;
+    this.messages.add({
       severity: 'info',
-      summary: 'Status Atualizado',
-      detail: message
+      summary: 'Status atualizado',
+      detail: becameCompleted ? 'Tarefa marcada como concluída' : 'Tarefa marcada como pendente',
     });
   }
 }
+export { AppComponent as App };

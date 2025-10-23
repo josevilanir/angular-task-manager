@@ -1,87 +1,90 @@
-<!-- TESTE TAILWIND - Remover depois -->
-<div class="bg-blue-500 text-white p-4 text-center font-bold">
-  ✅ Tailwind CSS está funcionando!
-</div>
+<!-- Wrapper geral (fundo em gradiente) -->
+<div class="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
 
-<div style="min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-  <p-toast />
-  <p-confirmDialog />
+  <!-- HEADER com gradiente e efeitos -->
+  <header class="relative overflow-hidden shadow-lg">
+    <div class="bg-gradient-to-br from-indigo-500 to-purple-600 py-8">
+      <!-- blobs decorativos -->
+      <div class="blob top-[-60px] right-[-60px] w-[220px] h-[220px] bg-white/20"></div>
+      <div class="blob bottom-[-40px] left-[-40px] w-[180px] h-[180px] bg-white/20"></div>
 
-  <!-- Header Moderno com Gradiente -->
-  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); position: relative; overflow: hidden;">
-    <!-- Efeito de bolhas decorativas -->
-    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; filter: blur(40px);"></div>
-    <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; filter: blur(30px);"></div>
-    
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1;">
-      <div class="flex justify-content-between align-items-center">
-        <!-- Logo e Título -->
-        <div class="flex align-items-center gap-3" style="animation: slideIn 0.5s ease;">
-          <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-            <i class="pi pi-check-square" style="font-size: 2rem; color: white; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));"></i>
+      <div class="container-app relative z-10 flex items-center justify-between gap-4">
+        <!-- Logo + Título -->
+        <div class="flex items-center gap-3">
+          <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow">
+            <i class="pi pi-check-square text-white text-2xl drop-shadow"></i>
           </div>
           <div>
-            <h1 class="m-0" style="color: white; font-size: 1.875rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); letter-spacing: -0.5px;">
+            <h1 class="text-white font-extrabold tracking-tight text-2xl sm:text-3xl">
               {{ title() }}
             </h1>
-            <p style="color: rgba(255, 255, 255, 0.8); margin: 0.25rem 0 0 0; font-size: 0.875rem; font-weight: 500;">
+            <p class="text-white/80 text-sm">
               Organize suas tarefas com eficiência
             </p>
           </div>
         </div>
-        
-        <!-- Stats Badge -->
-        <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 0.75rem 1.5rem; border-radius: 50px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); animation: fadeIn 0.7s ease;">
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-list" style="color: white; font-size: 1.25rem;"></i>
-            <div>
-              <span style="color: rgba(255, 255, 255, 0.8); font-size: 0.75rem; display: block; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total</span>
-              <span style="color: white; font-size: 1.25rem; font-weight: 800;">{{ tasks().length }}</span>
-              <span style="color: rgba(255, 255, 255, 0.8); font-size: 0.875rem; margin-left: 0.25rem;">tarefa(s)</span>
-            </div>
-          </div>
+
+        <!-- Ações do topo (exemplo) -->
+        <div class="flex items-center gap-2">
+          <button pButton type="button" label="Sobre" icon="pi pi-info-circle"
+                  class="p-button-rounded p-button-text text-white"></button>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- Main Content com Container Branco -->
-  <div class="container" style="max-width: 1200px; margin: 2rem auto; padding: 0 2rem;">
-    <!-- Card Container com fundo branco -->
-    <div style="background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 2.5rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); backdrop-filter: blur(10px); animation: fadeIn 0.5s ease;">
-      <app-task-list
-        [tasks]="tasks()"
-        (onAdd)="showAddDialog()"
-        (onEdit)="showEditDialog($event)"
-        (onDelete)="deleteTask($event)"
-        (onToggleComplete)="toggleComplete($event)"
-      />
+  <!-- CONTEÚDO -->
+  <main class="container-app py-8">
+    <!-- Barra superior / Toolbar -->
+    <p-toolbar class="mb-6 rounded-xl shadow-sm bg-white/70 backdrop-blur-sm">
+      <div class="p-toolbar-group-left flex items-center gap-2">
+        <i class="pi pi-list text-indigo-600"></i>
+        <span class="font-semibold">Minhas Tarefas</span>
+      </div>
+      <div class="p-toolbar-group-right">
+        <button pButton type="button" icon="pi pi-plus" label="Nova Tarefa"
+                class="p-button-rounded"></button>
+      </div>
+    </p-toolbar>
+
+    <!-- Conteúdo principal em cards -->
+    <div class="grid grid-cols-1 gap-6">
+      <!-- Lista de tarefas -->
+      <section class="rounded-2xl bg-white shadow-md p-4">
+        <app-task-list
+          [tasks]="tasks()"
+          (onAdd)="openCreateDialog()"
+          (onEdit)="openEditDialog($event)"
+          (onDelete)="confirmDelete($event)"
+          (onToggleComplete)="toggleComplete($event)">
+        </app-task-list>
+      </section>
+
+      <!-- Dialog de criação/edição -->
+      <p-dialog
+        [visible]="dialogVisible()"
+        (visibleChange)="dialogVisible.set($event)"
+        [modal]="true"
+        [closable]="true"
+        [dismissableMask]="true"
+        [style]="{ width: '40rem', maxWidth: '95vw' }"
+        [breakpoints]="{ '768px': '95vw' }"
+        [header]="isEditing() ? 'Editar Tarefa' : 'Nova Tarefa'">
+        <div class="pt-2">
+          <app-task-form
+            [task]="currentTask() ?? undefined"
+            (onSave)="saveTask($event)"
+            (onCancel)="closeDialog()">
+          </app-task-form>
+        </div>
+</p-dialog>
     </div>
-  </div>
+  </main>
 
-  <!-- Dialog para adicionar/editar tarefa -->
-  <p-dialog
-    [(visible)]="displayDialog"
-    [header]="selectedTask() ? 'Editar Tarefa' : 'Nova Tarefa'"
-    [modal]="true"
-    [style]="{width: '650px'}"
-    [draggable]="false"
-    [resizable]="false"
-    [dismissableMask]="true"
-  >
-    <app-task-form
-      [task]="selectedTask()"
-      (onSave)="saveTask($event)"
-      (onCancel)="hideDialog()"
-    />
-  </p-dialog>
-
-  <!-- Footer decorativo -->
-  <div style="text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.7); font-size: 0.875rem;">
-    <p style="margin: 0;">
-      Desenvolvido com 
-      <i class="pi pi-heart-fill" style="color: #ef4444; margin: 0 0.25rem; animation: pulse 2s infinite;"></i> 
-      usando Angular 20 + PrimeNG 20
-    </p>
-  </div>
+  <!-- FOOTER simples -->
+  <footer class="container-app py-8 text-center text-white/80">
+    <p>&copy; {{ currentYear() }} Task Manager — feito com Angular, PrimeNG e Tailwind</p>
+  </footer>
 </div>

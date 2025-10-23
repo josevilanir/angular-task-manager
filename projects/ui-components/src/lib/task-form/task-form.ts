@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { InputText } from 'primeng/inputtext';
 import { Button } from 'primeng/button';
 import { Task } from '../models/task.model';
+import { InputNumber } from 'primeng/inputnumber'; // +++
 
 @Component({
   selector: 'app-task-form',

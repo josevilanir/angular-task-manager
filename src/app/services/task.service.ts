@@ -1,146 +1,127 @@
-import { Injectable, signal, PLATFORM_ID, inject } from '@angular/core';
+// src/app/services/task.service.ts
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import type { Task } from '../../../projects/ui-components/src/lib/models/task.model';
 
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  completed: boolean;
-  priority: 'low' | 'medium' | 'high';
-  dueDate: Date;
-  createdAt: Date;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TaskService {
-  private tasksSignal = signal<Task[]>([]);
-  public tasks = this.tasksSignal.asReadonly();
   private platformId = inject(PLATFORM_ID);
-  private isBrowser: boolean;
+  private storageKey = 'tasks';
 
-  constructor() {
-    this.isBrowser = isPlatformBrowser(this.platformId);
-    this.loadTasks();
-  }
+  private tasksSignal = signal<Task[]>(this.load());
 
-  private loadTasks() {
-    if (!this.isBrowser) {
-      // Se não estiver no navegador, carrega dados de exemplo
-      this.tasksSignal.set(this.getSampleTasks());
-      return;
+  // ===== Persistence =====
+  private load(): Task[] {
+    if (isPlatformBrowser(this.platformId)) {
+      const raw = localStorage.getItem(this.storageKey);
+      if (raw) {
+        try {
+          const arr: any[] = JSON.parse(raw);
+          return arr.map((t) => ({
+            ...t,
+            // garante tipos corretos
+            createdAt: t.createdAt ? new Date(t.createdAt) : new Date(),
+            dueDate: t.dueDate ? new Date(t.dueDate) : new Date(),
+            estimateHours: Number(t.estimateHours ?? 0),
+            completed: Boolean(t.completed ?? false),
+          })) as Task[];
+        } catch {}
+      }
     }
-
-    const storedTasks = localStorage.getItem('tasks');
-    if (storedTasks) {
-      const parsedTasks = JSON.parse(storedTasks);
-      const tasks = parsedTasks.map((task: any) => ({
-        ...task,
-        createdAt: new Date(task.createdAt),
-        dueDate: new Date(task.dueDate)
-      }));
-      this.tasksSignal.set(tasks);
-    } else {
-      this.tasksSignal.set(this.getSampleTasks());
-    }
-  }
-
-  private saveTasks() {
-    if (this.isBrowser) {
-      localStorage.setItem('tasks', JSON.stringify(this.tasksSignal()));
-    }
-  }
-
-  private getSampleTasks(): Task[] {
+    // seed inicial com estimateHours
+    const now = new Date();
     return [
       {
         id: '1',
         title: 'Implementar autenticação',
-        description: 'Adicionar sistema de login e registro de usuários com JWT',
+        description: 'Adicionar login com JWT e refresh token',
         completed: false,
         priority: 'high',
-        dueDate: new Date(2025, 9, 30),
-        createdAt: new Date(2025, 9, 20)
+        dueDate: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2),
+        createdAt: now,
+        estimateHours: 6,
       },
       {
         id: '2',
         title: 'Revisar código do frontend',
-        description: 'Fazer code review dos componentes React e melhorar performance',
+        description: 'Refatorar componentes e otimizar performance',
         completed: true,
         priority: 'medium',
-        dueDate: new Date(2025, 9, 25),
-        createdAt: new Date(2025, 9, 18)
+        dueDate: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 5),
+        createdAt: now,
+        estimateHours: 3.5,
       },
-      {
-        id: '3',
-        title: 'Atualizar documentação',
-        description: 'Documentar as novas APIs REST criadas no último sprint',
-        completed: false,
-        priority: 'low',
-        dueDate: new Date(2025, 10, 5),
-        createdAt: new Date(2025, 9, 21)
-      }
     ];
   }
 
-  addTask(taskData: Partial<Task>): Task {
-    const newTask: Task = {
+  private persist() {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.tasksSignal()));
+    }
+  }
+
+  // ===== API =====
+  getTasks(): Task[] {
+    return this.tasksSignal();
+  }
+
+  createTask(payload: Partial<Task>): Task {
+    const now = new Date();
+    const task: Task = {
       id: this.generateId(),
-      title: taskData.title!,
-      description: taskData.description!,
-      completed: taskData.completed || false,
-      priority: taskData.priority || 'medium',
-      dueDate: taskData.dueDate!,
-      createdAt: new Date()
+      title: String(payload.title ?? 'Nova tarefa'),
+      description: String(payload.description ?? ''),
+      completed: Boolean(payload.completed ?? false),
+      priority: (payload.priority as any) ?? 'medium',
+      dueDate: payload.dueDate ? new Date(payload.dueDate) : now,
+      createdAt: now,
+      estimateHours: Number(payload.estimateHours ?? 0), // numérico ✅
     };
-
-    const currentTasks = this.tasksSignal();
-    this.tasksSignal.set([...currentTasks, newTask]);
-    this.saveTasks();
-    return newTask;
+    this.tasksSignal.update((list) => [task, ...list]);
+    this.persist();
+    return task;
   }
 
-  updateTask(id: string, taskData: Partial<Task>): Task | undefined {
-    const currentTasks = this.tasksSignal();
-    const index = currentTasks.findIndex(t => t.id === id);
-    
-    if (index !== -1) {
-      const updatedTask = { ...currentTasks[index], ...taskData };
-      const newTasks = [...currentTasks];
-      newTasks[index] = updatedTask;
-      this.tasksSignal.set(newTasks);
-      this.saveTasks();
-      return updatedTask;
-    }
-    return undefined;
+  updateTask(id: string, patch: Partial<Task>): Task | undefined {
+    let updated: Task | undefined;
+    this.tasksSignal.update((list) =>
+      list.map((t) => {
+        if (t.id !== id) return t;
+        updated = {
+          ...t,
+          ...patch,
+          dueDate: patch.dueDate ? new Date(patch.dueDate) : t.dueDate,
+          estimateHours: patch.estimateHours !== undefined ? Number(patch.estimateHours) : t.estimateHours,
+        };
+        return updated!;
+      })
+    );
+    if (updated) this.persist();
+    return updated;
   }
 
-  deleteTask(id: string): boolean {
-    const currentTasks = this.tasksSignal();
-    const newTasks = currentTasks.filter(t => t.id !== id);
-    
-    if (newTasks.length !== currentTasks.length) {
-      this.tasksSignal.set(newTasks);
-      this.saveTasks();
-      return true;
-    }
-    return false;
+  deleteTask(id: string) {
+    this.tasksSignal.update((list) => list.filter((t) => t.id !== id));
+    this.persist();
   }
 
   getTaskById(id: string): Task | undefined {
-    return this.tasksSignal().find(t => t.id === id);
+    return this.tasksSignal().find((t) => t.id === id);
   }
 
   toggleTaskComplete(id: string): Task | undefined {
-    const task = this.getTaskById(id);
-    if (task) {
-      return this.updateTask(id, { completed: !task.completed });
-    }
-    return undefined;
+    let updated: Task | undefined;
+    this.tasksSignal.update((list) =>
+      list.map((t) =>
+        t.id === id ? ((updated = { ...t, completed: !t.completed }), updated) : t
+      )
+    );
+    if (updated) this.persist();
+    return updated;
   }
 
+  // ===== Utils =====
   private generateId(): string {
-    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   }
 }
