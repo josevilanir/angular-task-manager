@@ -1,82 +1,110 @@
-<p-card [style]="{'margin-bottom': '1.5rem', 'transition': 'all 0.3s ease'}">
-  <!-- HEADER: Checkbox + Título + Tag -->
-  <div class="card-header" style="padding: 1.5rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-bottom: 2px solid #f3f4f6;">
-    <div class="flex justify-content-between align-items-center">
-      <div class="flex align-items-center gap-2" style="flex: 1;">
-        <input
-          type="checkbox"
-          [(ngModel)]="task.completed"
-          (change)="toggleComplete()"
-          style="width: 1.5rem; height: 1.5rem; cursor: pointer;"
-        />
+<div 
+  class="task-card" 
+  [class.completed]="task.completed"
+  [class.overdue]="isOverdue()"
+  style="
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border-left: 4px solid;
+    animation: slideInLeft 0.4s ease;
+  "
+  [style.border-left-color]="
+    task.priority === 'high' ? '#ef4444' : 
+    task.priority === 'medium' ? '#f59e0b' : 
+    '#10b981'
+  "
+  [style.opacity]="task.completed ? '0.7' : '1'"
+>
+  <div class="flex align-items-start gap-3">
+    <!-- Checkbox para completar -->
+    <p-checkbox 
+      [(ngModel)]="task.completed" 
+      [binary]="true" 
+      (onChange)="toggleComplete()"
+      [inputId]="'task-' + task.id"
+      styleClass="custom-checkbox"
+    />
+
+    <!-- Conteúdo da tarefa -->
+    <div class="flex-grow-1">
+      <div class="flex justify-content-between align-items-start mb-2">
         <h3 
-          class="m-0" 
-          [style.text-decoration]="task.completed ? 'line-through' : 'none'" 
-          [style.opacity]="task.completed ? '0.6' : '1'"
-          style="font-size: 1.35rem; font-weight: 700; color: #1f2937; transition: all 0.3s ease;">
+          [style.text-decoration]="task.completed ? 'line-through' : 'none'"
+          style="margin: 0; color: #1f2937; font-size: 1.25rem; font-weight: 700;"
+        >
           {{ task.title }}
         </h3>
+        
+        <!-- Tag de prioridade -->
+        <p-tag 
+          [value]="getPriorityLabel(task.priority)" 
+          [severity]="getPrioritySeverity(task.priority)"
+          [style]="{
+            'font-weight': '600',
+            'padding': '0.35rem 0.75rem',
+            'border-radius': '8px'
+          }"
+        />
       </div>
-      <p-tag 
-        [value]="task.priority" 
-        [severity]="getPrioritySeverity()"
-        [style]="{'animation': 'pulse 2s infinite'}"
-      />
-    </div>
-  </div>
 
-  <!-- CORPO: Descrição com ícone -->
-  <div style="padding: 1.5rem; background: white;">
-    <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
-      <i class="pi pi-align-left" style="color: #667eea; font-size: 1.2rem; margin-top: 0.2rem;"></i>
-      <div style="flex: 1;">
-        <strong style="display: block; margin-bottom: 0.5rem; color: #667eea; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px;">
-          Descrição
-        </strong>
-        <p style="margin: 0; color: #4b5563; line-height: 1.7; font-size: 1rem;">
-          {{ task.description }}
-        </p>
-      </div>
-    </div>
-  </div>
+      <p 
+        [style.text-decoration]="task.completed ? 'line-through' : 'none'"
+        style="color: #6b7280; margin: 0.5rem 0 1rem 0; line-height: 1.6;"
+      >
+        {{ task.description }}
+      </p>
 
-  <!-- DATAS com ícones modernos -->
-  <div style="display: flex; gap: 2rem; padding: 1rem 1.5rem; background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border-top: 1px solid #e5e7eb;">
-    <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <div style="background: #10b981; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-        <i class="pi pi-calendar" style="color: white; font-size: 0.875rem;"></i>
-      </div>
-      <div>
-        <small style="display: block; color: #6b7280; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Criado</small>
-        <small style="color: #1f2937; font-weight: 600; font-size: 0.875rem;">{{ formatDate(task.createdAt) }}</small>
-      </div>
-    </div>
-    <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <div style="background: #f59e0b; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-        <i class="pi pi-clock" style="color: white; font-size: 0.875rem;"></i>
-      </div>
-      <div>
-        <small style="display: block; color: #6b7280; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Vencimento</small>
-        <small style="color: #1f2937; font-weight: 600; font-size: 0.875rem;">{{ formatDate(task.dueDate) }}</small>
-      </div>
-    </div>
-  </div>
+      <!-- Informações adicionais -->
+      <div class="flex align-items-center gap-3 mb-3" style="font-size: 0.875rem; color: #6b7280;">
+        <div class="flex align-items-center gap-1">
+          <i class="pi pi-calendar" style="font-size: 0.875rem;"></i>
+          <span>Vencimento: {{ formatDate(task.dueDate) }}</span>
+        </div>
+        
+        <div class="flex align-items-center gap-1" *ngIf="isOverdue()">
+          <i class="pi pi-exclamation-triangle" style="color: #ef4444; font-size: 0.875rem;"></i>
+          <span style="color: #ef4444; font-weight: 600;">Atrasada</span>
+        </div>
 
-  <!-- FOOTER: Botões com espaçamento -->
-  <div style="display: flex; gap: 0.75rem; justify-content: flex-end; padding: 1.25rem 1.5rem; background: white; border-top: 1px solid #f3f4f6;">
-    <p-button
-      icon="pi pi-pencil"
-      label="Editar"
-      severity="info"
-      (onClick)="editTask()"
-      [style]="{'border-radius': '10px', 'font-weight': '600'}"
-    />
-    <p-button
-      icon="pi pi-trash"
-      label="Excluir"
-      severity="danger"
-      (onClick)="deleteTask()"
-      [style]="{'border-radius': '10px', 'font-weight': '600'}"
-    />
+        <div class="flex align-items-center gap-1" *ngIf="task.completed">
+          <i class="pi pi-check-circle" style="color: #10b981; font-size: 0.875rem;"></i>
+          <span style="color: #10b981; font-weight: 600;">Concluída</span>
+        </div>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="flex gap-2">
+        <p-button
+          icon="pi pi-pencil"
+          label="Editar"
+          (onClick)="editTask()"
+          [outlined]="true"
+          severity="info"
+          size="small"
+          [style]="{
+            'border-radius': '8px',
+            'padding': '0.5rem 1rem',
+            'font-weight': '600'
+          }"
+        />
+        <p-button
+          icon="pi pi-trash"
+          label="Excluir"
+          (onClick)="deleteTask()"
+          [outlined]="true"
+          severity="danger"
+          size="small"
+          [style]="{
+            'border-radius': '8px',
+            'padding': '0.5rem 1rem',
+            'font-weight': '600'
+          }"
+        />
+      </div>
+    </div>
   </div>
-</p-card>
+</div>
