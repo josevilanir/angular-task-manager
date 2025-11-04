@@ -9,7 +9,6 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
-import { Toolbar } from 'primeng/toolbar';
 
 @Component({
   selector: 'app-root',
@@ -22,8 +21,7 @@ import { Toolbar } from 'primeng/toolbar';
     Dialog,
     ConfirmDialog,
     Toast,
-    Button,
-    Toolbar
+    Button
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './app.html',
@@ -65,14 +63,16 @@ export class App {
       this.messageService.add({
         severity: 'success',
         summary: 'Sucesso',
-        detail: 'Tarefa atualizada com sucesso!'
+        detail: 'Tarefa atualizada com sucesso!',
+        life: 3000
       });
     } else {
       this.taskService.addTask(taskData);
       this.messageService.add({
         severity: 'success',
         summary: 'Sucesso',
-        detail: 'Tarefa criada com sucesso!'
+        detail: 'Tarefa criada com sucesso!',
+        life: 3000
       });
     }
     
@@ -86,12 +86,14 @@ export class App {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sim',
       rejectLabel: 'Não',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.taskService.deleteTask(task.id);
         this.messageService.add({
           severity: 'info',
           summary: 'Excluído',
-          detail: 'Tarefa excluída com sucesso!'
+          detail: 'Tarefa excluída com sucesso!',
+          life: 3000
         });
       }
     });
@@ -100,13 +102,22 @@ export class App {
   toggleComplete(task: Task) {
     this.taskService.toggleTaskComplete(task.id);
     const message = task.completed 
-      ? 'Tarefa marcada como pendente' 
-      : 'Tarefa marcada como concluída';
+      ? 'Tarefa marcada como pendente!'
+      : 'Tarefa concluída!';
     
     this.messageService.add({
-      severity: 'info',
-      summary: 'Status Atualizado',
-      detail: message
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: message,
+      life: 2000
     });
+  }
+
+  get completedCount(): number {
+    return this.tasks().filter(t => t.completed).length;
+  }
+
+  get pendingCount(): number {
+    return this.tasks().filter(t => !t.completed).length;
   }
 }
