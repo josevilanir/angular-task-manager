@@ -22,6 +22,32 @@
     />
   </div>
 
+  <!-- Estatísticas -->
+  <div class="grid mb-4" style="margin-bottom: 2rem;">
+    <div class="col-12 md:col-6">
+      <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 1.5rem; border-radius: 16px; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+        <div class="flex align-items-center gap-3">
+          <i class="pi pi-check-circle" style="font-size: 2.5rem; opacity: 0.9;"></i>
+          <div>
+            <p style="margin: 0; font-size: 0.875rem; opacity: 0.9; font-weight: 600;">Concluídas</p>
+            <h3 style="margin: 0.25rem 0 0 0; font-size: 2rem; font-weight: 800;">{{ completedCount }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 md:col-6">
+      <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 1.5rem; border-radius: 16px; color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+        <div class="flex align-items-center gap-3">
+          <i class="pi pi-clock" style="font-size: 2.5rem; opacity: 0.9;"></i>
+          <div>
+            <p style="margin: 0; font-size: 0.875rem; opacity: 0.9; font-weight: 600;">Pendentes</p>
+            <h3 style="margin: 0.25rem 0 0 0; font-size: 2rem; font-weight: 800;">{{ pendingCount }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Estado vazio melhorado -->
   <div *ngIf="tasks.length === 0" class="empty-state" style="margin: 3rem 0; padding: 4rem 2rem; border-radius: 20px; background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%); border: 3px dashed #e0e7ff; text-align: center; animation: fadeIn 0.5s ease;">
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 120px; height: 120px; margin: 0 auto 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3); animation: pulse 2s infinite;">
@@ -32,7 +58,7 @@
       Comece criando sua primeira tarefa e organize suas atividades de forma eficiente!
     </p>
     <p-button
-      icon="pi pi-plus-circle"
+      icon="pi pi-plus"
       label="Criar Primeira Tarefa"
       (onClick)="addTask()"
       [style]="{
@@ -41,39 +67,20 @@
         'padding': '1rem 2.5rem',
         'border-radius': '12px',
         'font-weight': '700',
-        'box-shadow': '0 4px 12px rgba(102, 126, 234, 0.4)',
-        'font-size': '1.05rem'
+        'font-size': '1.05rem',
+        'box-shadow': '0 4px 12px rgba(102, 126, 234, 0.4)'
       }"
     />
   </div>
 
-  <!-- Grid de tarefas -->
-  <div *ngIf="tasks.length > 0" style="display: grid; gap: 1.5rem; animation: fadeIn 0.5s ease;">
-    <div *ngFor="let task of tasks; let i = index" [style.animation]="'fadeIn 0.5s ease ' + (i * 0.1) + 's both'">
-      <app-task-card
-        [task]="task"
-        (onEdit)="editTask($event)"
-        (onDelete)="deleteTask($event)"
-        (onToggleComplete)="toggleComplete($event)"
-      />
-    </div>
-  </div>
-
-  <!-- Estatísticas no rodapé (se houver tarefas) -->
-  <div *ngIf="tasks.length > 0" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e5e7eb; display: flex; gap: 2rem; justify-content: center; animation: fadeIn 0.7s ease;">
-    <div style="text-align: center; padding: 1rem 2rem; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; min-width: 140px;">
-      <i class="pi pi-check-circle" style="font-size: 1.5rem; color: #10b981; margin-bottom: 0.5rem;"></i>
-      <div style="font-size: 1.75rem; font-weight: 800; color: #10b981;">
-        {{ completedCount }}
-      </div>
-      <div style="font-size: 0.875rem; color: #059669; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Concluídas</div>
-    </div>
-    <div style="text-align: center; padding: 1rem 2rem; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; min-width: 140px;">
-      <i class="pi pi-hourglass" style="font-size: 1.5rem; color: #f59e0b; margin-bottom: 0.5rem;"></i>
-      <div style="font-size: 1.75rem; font-weight: 800; color: #f59e0b;">
-        {{ pendingCount }}
-      </div>
-      <div style="font-size: 0.875rem; color: #d97706; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Pendentes</div>
-    </div>
+  <!-- Lista de tarefas -->
+  <div *ngIf="tasks.length > 0" class="tasks-grid">
+    <app-task-card
+      *ngFor="let task of tasks; trackBy: trackByTaskId"
+      [task]="task"
+      (onEdit)="editTask(task)"
+      (onDelete)="deleteTask(task)"
+      (onToggleComplete)="toggleComplete(task)"
+    />
   </div>
 </div>
