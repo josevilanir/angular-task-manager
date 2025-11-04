@@ -1,38 +1,42 @@
-<div style="min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-  <p-toast />
+<div class="app-container" style="min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <!-- Toast para notificações -->
+  <p-toast position="top-right" />
+  
+  <!-- Dialog de confirmação -->
   <p-confirmDialog />
 
-  <!-- Header Moderno com Gradiente -->
-  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); position: relative; overflow: hidden;">
-    <!-- Efeito de bolhas decorativas -->
-    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; filter: blur(40px);"></div>
-    <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; filter: blur(30px);"></div>
-    
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1;">
+  <!-- Header com gradiente -->
+  <div class="header" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem 0; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
       <div class="flex justify-content-between align-items-center">
-        <!-- Logo e Título -->
-        <div class="flex align-items-center gap-3" style="animation: slideIn 0.5s ease;">
-          <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-            <i class="pi pi-check-square" style="font-size: 2rem; color: white; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));"></i>
-          </div>
-          <div>
-            <h1 class="m-0" style="color: white; font-size: 1.875rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); letter-spacing: -0.5px;">
-              {{ title() }}
-            </h1>
-            <p style="color: rgba(255, 255, 255, 0.8); margin: 0.25rem 0 0 0; font-size: 0.875rem; font-weight: 500;">
-              Organize suas tarefas com eficiência
-            </p>
-          </div>
+        <div>
+          <h1 style="color: white; margin: 0; font-size: 2.5rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">
+            <i class="pi pi-check-square" style="margin-right: 0.75rem;"></i>
+            {{ title() }}
+          </h1>
+          <p style="color: rgba(255, 255, 255, 0.9); margin: 0.5rem 0 0 0; font-size: 1.1rem;">
+            Organize suas tarefas de forma eficiente e produtiva
+          </p>
         </div>
-        
-        <!-- Stats Badge -->
-        <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 0.75rem 1.5rem; border-radius: 50px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); animation: fadeIn 0.7s ease;">
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-list" style="color: white; font-size: 1.25rem;"></i>
-            <div>
+
+        <!-- Cards de estatísticas no header -->
+        <div class="flex gap-3">
+          <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 12px; text-align: center; min-width: 120px;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <span style="color: rgba(255, 255, 255, 0.8); font-size: 0.75rem; display: block; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Concluídas</span>
+              <span style="color: white; font-size: 1.75rem; font-weight: 800;">{{ completedCount }}</span>
+            </div>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 12px; text-align: center; min-width: 120px;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <span style="color: rgba(255, 255, 255, 0.8); font-size: 0.75rem; display: block; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Pendentes</span>
+              <span style="color: white; font-size: 1.75rem; font-weight: 800;">{{ pendingCount }}</span>
+            </div>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 12px; text-align: center; min-width: 120px;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
               <span style="color: rgba(255, 255, 255, 0.8); font-size: 0.75rem; display: block; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total</span>
-              <span style="color: white; font-size: 1.25rem; font-weight: 800;">{{ tasks().length }}</span>
-              <span style="color: rgba(255, 255, 255, 0.8); font-size: 0.875rem; margin-left: 0.25rem;">tarefa(s)</span>
+              <span style="color: white; font-size: 1.75rem; font-weight: 800;">{{ tasks().length }}</span>
             </div>
           </div>
         </div>
