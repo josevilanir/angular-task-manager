@@ -27,7 +27,6 @@ export class TaskService {
 
   private loadTasks() {
     if (!this.isBrowser) {
-      // Se não estiver no navegador, carrega dados de exemplo
       this.tasksSignal.set(this.getSampleTasks());
       return;
     }
@@ -60,17 +59,17 @@ export class TaskService {
         description: 'Adicionar sistema de login e registro de usuários com JWT',
         completed: false,
         priority: 'high',
-        dueDate: new Date(2025, 9, 30),
-        createdAt: new Date(2025, 9, 20)
+        dueDate: new Date(2025, 10, 30),
+        createdAt: new Date(2025, 10, 20)
       },
       {
         id: '2',
         title: 'Revisar código do frontend',
-        description: 'Fazer code review dos componentes React e melhorar performance',
+        description: 'Fazer code review dos componentes Angular e melhorar performance',
         completed: true,
         priority: 'medium',
-        dueDate: new Date(2025, 9, 25),
-        createdAt: new Date(2025, 9, 18)
+        dueDate: new Date(2025, 10, 25),
+        createdAt: new Date(2025, 10, 18)
       },
       {
         id: '3',
@@ -78,8 +77,8 @@ export class TaskService {
         description: 'Documentar as novas APIs REST criadas no último sprint',
         completed: false,
         priority: 'low',
-        dueDate: new Date(2025, 10, 5),
-        createdAt: new Date(2025, 9, 21)
+        dueDate: new Date(2025, 11, 5),
+        createdAt: new Date(2025, 10, 21)
       }
     ];
   }
@@ -101,46 +100,36 @@ export class TaskService {
     return newTask;
   }
 
-  updateTask(id: string, taskData: Partial<Task>): Task | undefined {
+  updateTask(id: string, updates: Partial<Task>): void {
     const currentTasks = this.tasksSignal();
-    const index = currentTasks.findIndex(t => t.id === id);
-    
-    if (index !== -1) {
-      const updatedTask = { ...currentTasks[index], ...taskData };
-      const newTasks = [...currentTasks];
-      newTasks[index] = updatedTask;
-      this.tasksSignal.set(newTasks);
-      this.saveTasks();
-      return updatedTask;
-    }
-    return undefined;
+    const updatedTasks = currentTasks.map(task =>
+      task.id === id ? { ...task, ...updates } : task
+    );
+    this.tasksSignal.set(updatedTasks);
+    this.saveTasks();
   }
 
-  deleteTask(id: string): boolean {
+  deleteTask(id: string): void {
     const currentTasks = this.tasksSignal();
-    const newTasks = currentTasks.filter(t => t.id !== id);
-    
-    if (newTasks.length !== currentTasks.length) {
-      this.tasksSignal.set(newTasks);
-      this.saveTasks();
-      return true;
-    }
-    return false;
+    const filteredTasks = currentTasks.filter(task => task.id !== id);
+    this.tasksSignal.set(filteredTasks);
+    this.saveTasks();
+  }
+
+  toggleTaskComplete(id: string): void {
+    const currentTasks = this.tasksSignal();
+    const updatedTasks = currentTasks.map(task =>
+      task.id === id ? { ...task, completed: !task.completed } : task
+    );
+    this.tasksSignal.set(updatedTasks);
+    this.saveTasks();
   }
 
   getTaskById(id: string): Task | undefined {
-    return this.tasksSignal().find(t => t.id === id);
-  }
-
-  toggleTaskComplete(id: string): Task | undefined {
-    const task = this.getTaskById(id);
-    if (task) {
-      return this.updateTask(id, { completed: !task.completed });
-    }
-    return undefined;
+    return this.tasksSignal().find(task => task.id === id);
   }
 
   private generateId(): string {
-    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 }
